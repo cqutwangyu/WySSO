@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.sso.user.mapper.UserDao">
+    <!--注册-->
+    <insert id="insertUser" parameterType="com.wy.sso.user.domain.UserInfo">
+        insert into b_user (user_name,pet_name, password)
+        values (#{userName},#{petName}, #{password})
+    </insert>
+    <update id="updateUser" parameterType="com.wy.sso.user.domain.UserInfo">
+        update b_user set pet_name = #{petName},password = #{password}
+        where flow_id = #{flowId}
+    </update>
+    <!--删除用户-->
+    <delete id="deleteUserById" parameterType="String">
+        delete from b_user where flow_id = #{userId}
+    </delete>
+    <!--查询用户信息-->
+    <select id="selectUserByName" parameterType="String" resultType="com.wy.sso.user.domain.UserInfo">
+        select flow_id,user_name,pet_name,password,create_time
+        from b_user
+        where user_name = #{userName}
+    </select>
+    <select id="selectAllUser" resultType="com.wy.sso.user.domain.UserInfo">
+        select flow_id,user_name,pet_name,password,create_time
+        from b_user
+    </select>
+</mapper>
