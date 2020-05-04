@@ -52,7 +52,6 @@ public class UserServiceImpl extends AbstractService implements UserService {
             String token = Constants.TOKEN_CODE_KEY + TokenUtil.sign(loginInfo.getUserName(), loginInfo.getPassword());
             db_user.setToken(token);
             redisCache.setCacheObject(token, db_user, 30, TimeUnit.MINUTES);
-            redisCache.setCacheObject("SSO","CRM");
             return token;
         } else {
             throw new Exception("密码错误");
