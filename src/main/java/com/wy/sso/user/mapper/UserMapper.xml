@@ -24,4 +24,10 @@
         select flow_id,user_name,pet_name,password,create_time
         from b_user
     </select>
+    <select id="selectUserRoles" resultType="com.wy.sso.user.domain.RoleInfo">
+        select r.flow_id,r.sys_id,r.role_name,r.create_time
+        from b_user u inner join b_user_role ur on u.flow_id = ur.user_id
+                inner join b_role r on r.flow_id = ur.role_id
+        where u.flow_id = #{flowId}
+    </select>
 </mapper>

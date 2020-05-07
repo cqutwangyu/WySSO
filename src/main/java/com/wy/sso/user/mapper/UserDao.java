@@ -1,5 +1,6 @@
 package com.wy.sso.user.mapper;
 
+import com.wy.sso.user.domain.RoleInfo;
 import com.wy.sso.user.domain.UserInfo;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface UserDao {
     int deleteUserById(String userId);
 
     int updateUser(UserInfo userInfo);
+
+    List<RoleInfo> selectUserRoles(Integer flowId);
 }

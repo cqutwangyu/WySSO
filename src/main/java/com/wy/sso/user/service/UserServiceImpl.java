@@ -4,6 +4,7 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import com.wy.sso.framework.AbstractService;
 import com.wy.sso.redis.RedisCache;
 import com.wy.sso.user.domain.LoginInfo;
+import com.wy.sso.user.domain.RoleInfo;
 import com.wy.sso.user.domain.UserInfo;
 import com.wy.sso.user.mapper.UserDao;
 import com.wy.sso.utils.Constants;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,8 +38,11 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public Object login(LoginInfo loginInfo) throws Exception {
         String verifyKey = Constants.CAPTCHA_CODE_KEY + loginInfo.getUuid();
         String captcha = redisCache.getCacheObject(verifyKey);
+        if(captcha==null){
+            throw new Exception("验证码已过期");
+        }
         redisCache.deleteObject(verifyKey);
-        if (!loginInfo.getCode().equals(captcha)) {
+        if (!loginInfo.getCode().toLowerCase().equals(captcha.toLowerCase())) {
             throw new Exception("验证码错误");
         }
         UserInfo db_user = userDao.selectUserByName(loginInfo.getUserName());
@@ -51,7 +52,9 @@ public class UserServiceImpl extends AbstractService implements UserService {
         if (db_user.getPassword().equals(loginInfo.getPassword())) {
             String token = Constants.TOKEN_CODE_KEY + TokenUtil.sign(loginInfo.getUserName(), loginInfo.getPassword());
             db_user.setToken(token);
+            List<RoleInfo> roles = userDao.selectUserRoles(db_user.getFlowId());
             redisCache.setCacheObject(token, db_user, 30, TimeUnit.MINUTES);
+            redisCache.setCacheObject(token+"roles", roles);
             return token;
         } else {
             throw new Exception("密码错误");

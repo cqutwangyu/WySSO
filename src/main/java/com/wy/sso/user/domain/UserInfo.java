@@ -1,6 +1,7 @@
 package com.wy.sso.user.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author wangyu
@@ -13,12 +14,30 @@ public class UserInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String token;
+    private List<RoleInfo> roles;
+    private List<UserPermissionInfo> permissionInfoList;
     /*db*/
     private Integer flowId;
     private String userName;
     private String petName;
     private String password;
     private String createTime;
+
+    public List<UserPermissionInfo> getPermissionInfoList() {
+        return permissionInfoList;
+    }
+
+    public void setPermissionInfoList(List<UserPermissionInfo> permissionInfoList) {
+        this.permissionInfoList = permissionInfoList;
+    }
+
+    public List<RoleInfo> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleInfo> roles) {
+        this.roles = roles;
+    }
 
     public String getPetName() {
         return petName;
