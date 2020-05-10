@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -38,11 +39,11 @@ public class UserServiceImpl extends AbstractService implements UserService {
     public Object login(LoginInfo loginInfo) throws Exception {
         String verifyKey = Constants.CAPTCHA_CODE_KEY + loginInfo.getUuid();
         String captcha = redisCache.getCacheObject(verifyKey);
-        if(captcha==null){
+        if (captcha == null) {
             throw new Exception("验证码已过期");
         }
         redisCache.deleteObject(verifyKey);
-        if (!loginInfo.getCode().toLowerCase().equals(captcha.toLowerCase())) {
+        if (!loginInfo.getCode().equalsIgnoreCase(captcha)) {
             throw new Exception("验证码错误");
         }
         UserInfo db_user = userDao.selectUserByName(loginInfo.getUserName());
@@ -54,7 +55,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
             db_user.setToken(token);
             List<RoleInfo> roles = userDao.selectUserRoles(db_user.getFlowId());
             redisCache.setCacheObject(token, db_user, 30, TimeUnit.MINUTES);
-            redisCache.setCacheObject(token+"roles", roles);
+            redisCache.setCacheObject(token + "roles", roles);
             return token;
         } else {
             throw new Exception("密码错误");
@@ -84,7 +85,13 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
     @Override
     public Object updateUserInfo(UserInfo userInfo) {
-        return userDao.updateUser(userInfo) == 1 ? "更新成功" : "更新失败";
+        int flag = userDao.updateUser(userInfo);
+        if (flag == 1) {
+            UserInfo newUserInfo = userDao.selectUserByName(currentUser().getUserName());
+            newUserInfo.setToken(getToken());
+            redisCache.setCacheObject(getToken(), newUserInfo, 30, TimeUnit.MINUTES);
+        }
+        return flag == 1 ? "更新成功" : "更新失败";
     }
 
     @Override

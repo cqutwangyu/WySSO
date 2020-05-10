@@ -21,7 +21,25 @@ public class UserInfo implements Serializable {
     private String userName;
     private String petName;
     private String password;
+    private String avatar;
+    private String activated;
     private String createTime;
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getActivated() {
+        return activated;
+    }
+
+    public void setActivated(String activated) {
+        this.activated = activated;
+    }
 
     public List<UserPermissionInfo> getPermissionInfoList() {
         return permissionInfoList;

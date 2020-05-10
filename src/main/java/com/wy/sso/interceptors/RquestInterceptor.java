@@ -1,8 +1,12 @@
 package com.wy.sso.interceptors;
 
+import com.wy.sso.redis.RedisCache;
+import com.wy.sso.user.domain.UserInfo;
+import com.wy.sso.utils.Constants;
 import com.wy.sso.utils.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -10,6 +14,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName RquestInterceptor
@@ -21,6 +26,9 @@ import java.util.Enumeration;
 @Component
 public class RquestInterceptor extends HandlerInterceptorAdapter {
     private final static Logger logger = LoggerFactory.getLogger(RquestInterceptor.class);
+
+    @Autowired
+    private RedisCache redisCache;
 
     private final static class MethodType {
         /*axios请求时，会先发送一个OPTIONS请求*/
@@ -66,7 +74,7 @@ public class RquestInterceptor extends HandlerInterceptorAdapter {
         }
         //除login和register之外的请求需验证token
         if (requestURI.equals(UrlPath.getCodeImg) || requestURI.equals(UrlPath.login)
-                || requestURI.equals(UrlPath.register) || TokenUtil.verify(token)) {
+                || requestURI.equals(UrlPath.register) || verifyToken(token)) {
             long start = System.currentTimeMillis();
             request.setAttribute("start", start);
             logger.info(request.getRequestURI() + "请求到达");
@@ -76,6 +84,22 @@ public class RquestInterceptor extends HandlerInterceptorAdapter {
         return false;
 
     }
+
+    /**
+     * 单点登录验证Token
+     */
+    private boolean verifyToken(String token) {
+        if (token.contains(Constants.TOKEN_CODE_KEY)) {
+            UserInfo userInfo = redisCache.getCacheObject(token);
+            if (userInfo == null || userInfo.getToken() == null) {
+                return false;
+            }
+            //刷新令牌有效期
+            redisCache.setCacheObject(token, userInfo, 30, TimeUnit.MINUTES);
+        }
+        return true;
+    }
+
     /*下面的方法可以不重写*/
 
     /**

@@ -7,7 +7,13 @@
         values (#{userName},#{petName}, #{password})
     </insert>
     <update id="updateUser" parameterType="com.wy.sso.user.domain.UserInfo">
-        update b_user set pet_name = #{petName},password = #{password}
+        update b_user
+        <set>
+            <if test="petName != null and petName != ''">pet_name = #{petName},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+            <if test="activated != null and activated != ''">activated = #{activated}</if>
+        </set>
         where flow_id = #{flowId}
     </update>
     <!--删除用户-->
@@ -16,7 +22,7 @@
     </delete>
     <!--查询用户信息-->
     <select id="selectUserByName" parameterType="String" resultType="com.wy.sso.user.domain.UserInfo">
-        select flow_id,user_name,pet_name,password,create_time
+        select flow_id,user_name,pet_name,password,avatar,activated,create_time
         from b_user
         where user_name = #{userName}
     </select>

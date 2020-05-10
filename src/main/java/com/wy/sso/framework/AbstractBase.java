@@ -1,14 +1,14 @@
 package com.wy.sso.framework;
 
+import com.wy.sso.user.domain.RoleInfo;
 import com.wy.sso.user.domain.UserInfo;
-import com.wy.sso.user.mapper.UserDao;
-import com.wy.sso.utils.TokenUtil;
+import com.wy.sso.redis.RedisCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author wangyu4017@sefonsoft.com
@@ -21,24 +21,34 @@ public class AbstractBase {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private UserDao userDao;
+    private RedisCache redisCache;
 
     @Autowired
     protected HttpServletRequest request;
 
+    protected boolean isAdmin() {
+        for (RoleInfo roleInfo : getRoles()) {
+            if (roleInfo.getRoleName().equals("超级管理员")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<RoleInfo> getRoles() {
+        return redisCache.getCacheObject(getToken() + "roles");
+    }
+
     protected UserInfo currentUser() {
-        return getUser(getUserName());
+        return redisCache.getCacheObject(getToken());
     }
 
     protected String getToken() {
         return request.getHeader("X-Token");
     }
 
-    protected UserInfo getUser(String userName) {
-        return userDao.selectUserByName(userName);
-    }
 
     protected String getUserName() {
-        return TokenUtil.getUserName(getToken());
+        return currentUser().getUserName();
     }
 }

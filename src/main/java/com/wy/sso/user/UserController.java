@@ -1,7 +1,6 @@
 package com.wy.sso.user;
 
 import com.wy.sso.framework.AbstractController;
-import com.wy.sso.redis.RedisCache;
 import com.wy.sso.user.domain.LoginInfo;
 import com.wy.sso.user.domain.UserInfo;
 import com.wy.sso.user.service.UserService;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author wangyu
+ * @author wangyus
  * @title: UserContoller
  * @projectName WyUpms
  * @description: TODO

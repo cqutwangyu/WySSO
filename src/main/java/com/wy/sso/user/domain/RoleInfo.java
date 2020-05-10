@@ -15,8 +15,17 @@ public class RoleInfo implements Serializable {
     //db
     private Integer flowId;
     private Integer sysId;
+    private Integer depId;
     private String roleName;
     private String createTime;
+
+    public Integer getDepId() {
+        return depId;
+    }
+
+    public void setDepId(Integer depId) {
+        this.depId = depId;
+    }
 
     public String getSysName() {
         return sysName;
