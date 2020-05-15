@@ -14,6 +14,8 @@ public class UserInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String token;
+    private String roleNames;
+    private String depName;
     private List<RoleInfo> roles;
     private List<UserPermissionInfo> permissionInfoList;
     /*db*/
@@ -24,6 +26,22 @@ public class UserInfo implements Serializable {
     private String avatar;
     private String activated;
     private String createTime;
+
+    public String getRoleNames() {
+        return roleNames;
+    }
+
+    public void setRoleNames(String roleNames) {
+        this.roleNames = roleNames;
+    }
+
+    public String getDepName() {
+        return depName;
+    }
+
+    public void setDepName(String depName) {
+        this.depName = depName;
+    }
 
     public String getAvatar() {
         return avatar;

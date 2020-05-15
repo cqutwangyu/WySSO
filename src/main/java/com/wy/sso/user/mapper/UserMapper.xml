@@ -22,8 +22,20 @@
     </delete>
     <!--查询用户信息-->
     <select id="selectUserByName" parameterType="String" resultType="com.wy.sso.user.domain.UserInfo">
-        select flow_id,user_name,pet_name,password,avatar,activated,create_time
-        from b_user
+        SELECT
+            u.flow_id,
+            u.user_name,
+            u.pet_name,
+            u. PASSWORD,
+            u.avatar,
+            u.activated,
+            u.create_time,
+            d.dep_name
+        FROM
+            b_user u
+            INNER JOIN b_user_role ur ON u.flow_id = ur.user_id
+            INNER JOIN b_role r ON r.flow_id = ur.role_id
+            INNER JOIN b_department d ON d.flow_id = r.dep_id
         where user_name = #{userName}
     </select>
     <select id="selectAllUser" resultType="com.wy.sso.user.domain.UserInfo">

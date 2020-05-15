@@ -54,6 +54,15 @@ public class UserServiceImpl extends AbstractService implements UserService {
             String token = Constants.TOKEN_CODE_KEY + TokenUtil.sign(loginInfo.getUserName(), loginInfo.getPassword());
             db_user.setToken(token);
             List<RoleInfo> roles = userDao.selectUserRoles(db_user.getFlowId());
+            StringBuilder roleNames = new StringBuilder();
+            if (!roles.isEmpty()) {
+                for (RoleInfo role : roles) {
+                    roleNames.append(role.getRoleName()).append(",");
+                }
+                int length=roleNames.length();
+                roleNames = roleNames.replace(length - 1, length, "");
+                db_user.setRoleNames(roleNames.toString());
+            }
             redisCache.setCacheObject(token, db_user, 30, TimeUnit.MINUTES);
             redisCache.setCacheObject(token + "roles", roles);
             return token;
