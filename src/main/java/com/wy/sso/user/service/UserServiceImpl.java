@@ -8,6 +8,7 @@ import com.wy.sso.user.domain.RoleInfo;
 import com.wy.sso.user.domain.UserInfo;
 import com.wy.sso.user.mapper.UserDao;
 import com.wy.sso.utils.Constants;
+import com.wy.sso.utils.MD5Util;
 import com.wy.sso.utils.TokenUtil;
 import com.wy.sso.utils.VerifyCodeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class UserServiceImpl extends AbstractService implements UserService {
         if (Objects.isNull(db_user)) {
             throw new Exception("用户名错误");
         }
-        if (db_user.getPassword().equals(loginInfo.getPassword())) {
+        if (db_user.getPassword().equals(MD5Util.encode(loginInfo.getPassword()))) {
             String token = Constants.TOKEN_CODE_KEY + TokenUtil.sign(loginInfo.getUserName(), loginInfo.getPassword());
             db_user.setToken(token);
             List<RoleInfo> roles = userDao.selectUserRoles(db_user.getFlowId());
